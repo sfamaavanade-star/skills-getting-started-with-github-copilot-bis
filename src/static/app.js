@@ -35,21 +35,75 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Populate participants list
         const participantsList = activityCard.querySelector(".participants-list");
-        if (Array.isArray(details.participants) && details.participants.length > 0) {
-          details.participants.forEach((p) => {
-            const li = document.createElement("li");
-            li.textContent = p;
-            li.className = "participant-item";
-            li.style.marginBottom = "0.25rem";
-            participantsList.appendChild(li);
-          });
-        } else {
+        const renderNoParticipants = () => {
+          participantsList.innerHTML = "";
           const li = document.createElement("li");
           li.textContent = "No participants yet";
           li.className = "no-participants";
           li.style.fontStyle = "italic";
           li.style.color = "#555";
           participantsList.appendChild(li);
+        };
+
+        if (Array.isArray(details.participants) && details.participants.length > 0) {
+          details.participants.forEach((p) => {
+            const li = document.createElement("li");
+            li.className = "participant-item";
+            li.style.marginBottom = "0.25rem";
+
+            const span = document.createElement("span");
+            span.className = "participant-email";
+            span.textContent = p;
+
+            const btn = document.createElement("button");
+            btn.className = "delete-participant";
+            btn.setAttribute("aria-label", `Remove ${p}`);
+            btn.dataset.email = p;
+            btn.dataset.activity = name;
+            btn.textContent = "✖";
+
+            btn.addEventListener("click", async (e) => {
+              e.stopPropagation();
+              const activityName = btn.dataset.activity;
+              const email = btn.dataset.email;
+              try {
+                const res = await fetch(
+                  `/activities/${encodeURIComponent(activityName)}/participants?email=${encodeURIComponent(email)}`,
+                  { method: "DELETE" }
+                );
+
+                if (res.ok) {
+                  // remove from DOM
+                  li.remove();
+
+                  // if list becomes empty, show placeholder
+                  const remaining = participantsList.querySelectorAll(".participant-item");
+                  if (remaining.length === 0) renderNoParticipants();
+
+                  messageDiv.textContent = `${email} removed from ${activityName}`;
+                  messageDiv.className = "success";
+                  messageDiv.classList.remove("hidden");
+                  setTimeout(() => messageDiv.classList.add("hidden"), 4000);
+                } else {
+                  const data = await res.json().catch(() => ({}));
+                  messageDiv.textContent = data.detail || "Failed to remove participant";
+                  messageDiv.className = "error";
+                  messageDiv.classList.remove("hidden");
+                }
+              } catch (err) {
+                console.error("Error removing participant:", err);
+                messageDiv.textContent = "Failed to remove participant";
+                messageDiv.className = "error";
+                messageDiv.classList.remove("hidden");
+              }
+            });
+
+            li.appendChild(span);
+            li.appendChild(btn);
+            participantsList.appendChild(li);
+          });
+        } else {
+          renderNoParticipants();
         }
 
         // Add option to select dropdown
