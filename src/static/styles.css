@@ -37,6 +37,7 @@ main {
 
 @media (min-width: 768px) {
   main {
+    display: grid;
     grid-template-columns: 2fr 1fr;
   }
 }
@@ -72,6 +73,40 @@ section h3 {
 
 .activity-card p {
   margin-bottom: 8px;
+}
+
+/* Participant list styles */
+.participants-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.participant-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+
+.participant-email {
+  color: #333;
+  word-break: break-all;
+}
+
+.delete-participant {
+  background: none;
+  border: none;
+  color: #c62828;
+  cursor: pointer;
+  font-size: 0.95rem;
+  padding: 4px 6px;
+  border-radius: 4px;
+}
+
+.delete-participant:hover {
+  background-color: rgba(198,40,40,0.08);
 }
 
 .form-group {
