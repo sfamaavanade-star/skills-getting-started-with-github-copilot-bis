@@ -25,9 +25,32 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>${details.description}</p>
           <p><strong>Schedule:</strong> ${details.schedule}</p>
           <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
+          <div class="participants" aria-live="polite" style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid #eee;">
+            <h5 style="margin:0 0 0.25rem 0;font-size:0.95rem;color:#333;">Participants</h5>
+            <ul class="participants-list" style="list-style:disc;margin:0 0 0 1.25rem;padding:0;"></ul>
+          </div>
         `;
 
         activitiesList.appendChild(activityCard);
+
+        // Populate participants list
+        const participantsList = activityCard.querySelector(".participants-list");
+        if (Array.isArray(details.participants) && details.participants.length > 0) {
+          details.participants.forEach((p) => {
+            const li = document.createElement("li");
+            li.textContent = p;
+            li.className = "participant-item";
+            li.style.marginBottom = "0.25rem";
+            participantsList.appendChild(li);
+          });
+        } else {
+          const li = document.createElement("li");
+          li.textContent = "No participants yet";
+          li.className = "no-participants";
+          li.style.fontStyle = "italic";
+          li.style.color = "#555";
+          participantsList.appendChild(li);
+        }
 
         // Add option to select dropdown
         const option = document.createElement("option");
